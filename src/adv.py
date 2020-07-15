@@ -1,7 +1,9 @@
 from room import Room
+from player import Player
+import time
+
 
 # Declare all the rooms
-
 room = {
     'outside':  Room("Outside Cave Entrance",
                      "North of you, the cave mount beckons"),
@@ -23,7 +25,6 @@ earlier adventurers. The only exit is to the south."""),
 
 
 # Link rooms together
-
 room['outside'].n_to = room['foyer']
 room['foyer'].s_to = room['outside']
 room['foyer'].n_to = room['overlook']
@@ -33,19 +34,52 @@ room['narrow'].w_to = room['foyer']
 room['narrow'].n_to = room['treasure']
 room['treasure'].s_to = room['narrow']
 
-#
-# Main
-#
 
-# Make a new player object that is currently in the 'outside' room.
+# Main Loop
+player = Player(room['outside'])
 
-# Write a loop that:
-#
-# * Prints the current room name
-# * Prints the current description (the textwrap module might be useful here).
-# * Waits for user input and decides what to do.
-#
-# If the user enters a cardinal direction, attempt to move to the room there.
-# Print an error message if the movement isn't allowed.
-#
-# If the user enters "q", quit the game.
+user_input = ['']
+while not user_input[0].lower() in ['q', 'quit', 'exit']:
+
+    # Location Callout and Entry Prompt
+    time.sleep(0.5)
+    print(f"""\n==========\n{player.get_location()}\n==========\n""")
+    time.sleep(0.2)
+    user_input = input('> ').split()
+    if len(user_input) == 0:
+        user_input = ['']
+    time.sleep(0.5)
+
+    # Player Movement
+    if user_input[0].lower() in ['move', 'go', 'n', 'north', 's', 'south', 'e', 'east', 'w', 'west']:
+        if(user_input[0].lower() in ['n', 'north']) or (len(user_input) > 1 and ((user_input[0].lower() in ['move', 'go']) and (user_input[1].lower() in ['n', 'north']))):
+            new_location = player.get_location().to_n()
+            error = player.set_location(new_location)
+            if error:
+                print(error)
+        elif (user_input[0].lower() in ['s', 'south']) or (len(user_input) > 1 and ((user_input[0].lower() in ['move', 'go']) and (user_input[1].lower() in ['s', 'south']))):
+            new_location = player.get_location().to_s()
+            error = player.set_location(new_location)
+            if error:
+                print(error)
+        elif (user_input[0].lower() in ['e', 'east']) or (len(user_input) > 1 and ((user_input[0].lower() in ['move', 'go']) and (user_input[1].lower() in ['e', 'east']))):
+            new_location = player.get_location().to_e()
+            error = player.set_location(new_location)
+            if error:
+                print(error)
+        elif (user_input[0].lower() in ['w', 'west']) or (len(user_input) > 1 and ((user_input[0].lower() in ['move', 'go']) and (user_input[1].lower() in ['w', 'west']))):
+            new_location = player.get_location().to_w()
+            error = player.set_location(new_location)
+            if error:
+                print(error)
+        else:
+            print('> Please enter a valid command to proceed')
+
+    # Exit Condition
+    elif user_input[0].lower() in ['q', 'quit', 'exit']:
+        print('> Now exiting the program. Thank you for your time.')
+
+    # Invalid Command
+    else:
+        print('> Please enter a valid command to proceed.')
+        user_input = ['']
